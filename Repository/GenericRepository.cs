@@ -16,39 +16,70 @@ namespace HotelListing.Repository
             _db = _context.Set<T>();
         }
 
-        public Task Delete(int id)
+        public async Task Delete(int id)
         {
-            throw new NotImplementedException();
+            var entity = await _db.FindAsync(id);
+            _db.Remove(entity);
         }
 
         public void DeleteRange(IEnumerable<T> entities)
         {
-            throw new NotImplementedException();
+            _db.RemoveRange(entities);
         }
 
-        public Task<T> Get(Expression<Func<T, bool>> expression, List<string> includes = null)
+        public async Task<T> Get(Expression<Func<T, bool>> expression, List<string> includes = null)
         {
-            throw new NotImplementedException();
+            IQueryable<T> query = _db;
+            if(includes != null)
+            {
+                foreach(var includeProperty in includes)
+                {
+                    // tableları birleştirmek için
+                    query = query.Include(includeProperty);
+                }
+            }
+            return await query.AsNoTracking().FirstOrDefaultAsync(expression);
         }
 
-        public Task<IList<T>> GetAll(Expression<Func<T, bool>> expression = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, List<string> includes = null)
+        public async Task<IList<T>> GetAll(Expression<Func<T, bool>> expression = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, List<string> includes = null)
         {
-            throw new NotImplementedException();
+            IQueryable<T> query = _db;
+            if (expression != null)
+            {
+                // filtre için
+                query= query.Where(expression);
+            }
+
+            if (includes != null)
+            {
+                foreach (var includeProperty in includes)
+                {
+                    query = query.Include(includeProperty);
+                }
+            }
+
+            if(orderBy != null)
+            {
+                query = orderBy(query);
+            }
+
+            return await query.AsNoTracking().ToListAsync();
         }
 
-        public Task Insert(T entity)
+        public async Task Insert(T entity)
         {
-            throw new NotImplementedException();
+            await _db.AddAsync(entity);
         }
 
-        public Task InsertRange(IEnumerable<T> entities)
+        public async Task InsertRange(IEnumerable<T> entities)
         {
-            throw new NotImplementedException();
+            await _db.AddRangeAsync(entities);
         }
 
         public void Update(T entity)
         {
-            throw new NotImplementedException();
+            _db.Attach(entity); // databasedeki ile karşılaştır
+            _context.Entry(entity).State = EntityState.Modified;
         }
     }
 }
