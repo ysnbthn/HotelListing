@@ -1,19 +1,20 @@
 ﻿using HotelListing.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace HotelListing.Data
 {
-    public class DatabaseContext : DbContext
+    public class DatabaseContext : IdentityDbContext<ApiUser>
     {
-        public DatabaseContext(DbContextOptions options) : base(options)
-        {
-        }
+        public DatabaseContext(DbContextOptions options) : base(options){}
 
         public DbSet<Country> Countries { get; set; }
         public DbSet<Hotel> Hotels { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            base.OnModelCreating(builder);
+
             builder.Entity<Country>().HasData(
                 new Country { Id = 1, Name = "Jamaica", ShortName = "JM"},
                 new Country { Id = 2, Name = "Bahamas", ShortName = "BS"},
