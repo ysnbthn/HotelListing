@@ -1,5 +1,7 @@
 using HotelListing.Configurations;
 using HotelListing.Data;
+using HotelListing.IRepository;
+using HotelListing.Repository;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -14,7 +16,7 @@ builder.Services.AddDbContext<DatabaseContext>(options =>
 builder.Services.AddControllers();
 
 // kimler api'ya eriþebilir
-builder.Services.AddCors(policy=> {
+builder.Services.AddCors(policy => {
     policy.AddPolicy("AllowAll", bldr =>
         // þimdilik herkes
         bldr.AllowAnyOrigin()
@@ -24,9 +26,15 @@ builder.Services.AddCors(policy=> {
 });
 
 builder.Services.AddAutoMapper(typeof(MapperInitilizer));
+builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddControllers().AddNewtonsoftJson(op =>
+    op.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+
+
 
 // hatalarýn dosyada kaydýný tutmasý için logger ayarla
 builder.Host.UseSerilog((ctx, lc) => lc.WriteTo.Console().WriteTo.File(

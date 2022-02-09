@@ -18,6 +18,6 @@ namespace HotelListing.Models
         // database de normal country'i görücek ama bunu görmeyecek
         // biz doğrulamayı yapıp birbirine dönüştürerek aktarıcaz
         public int Id { get; set; }
-        public IList<HotelDTO> Hotel { get; set; }
+        public IList<HotelDTO> Hotels { get; set; }
     }
 }
