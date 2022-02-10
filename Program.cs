@@ -9,8 +9,9 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
-
+// servisleri ekle
 ServiceExtensions.AddServices(builder);
+ServiceExtensions.ConfigureJwt(builder);
 
 var app = builder.Build();
 
@@ -25,9 +26,10 @@ app.UseHttpsRedirection();
 
 app.UseCors("AllowAll");
 
-app.UseAuthorization();
-
+// kullanýcý kimlik doðrulamasý için ekle
 app.UseAuthentication();
+
+app.UseAuthorization();
 
 app.MapControllers();
 

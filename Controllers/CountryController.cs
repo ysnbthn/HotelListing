@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using HotelListing.Entities;
 using HotelListing.IRepository;
 using HotelListing.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -53,6 +55,24 @@ namespace HotelListing.Controllers
                 _logger.LogError(ex, $"Something Went Wrong in the {nameof(GetCountry)}");
                 return StatusCode(500, "Internal Server Error. Please Try Again Later.");
             }
+        }
+
+        [Authorize(Roles = "Administrator")]
+        [HttpPost]
+        public async Task<IActionResult> CreateCountry([FromBody] CreateCountryDTO countryDTO)
+        {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError($"Invalid POST attempt in {nameof(CreateCountry)}");
+                return BadRequest(ModelState);
+            }
+
+            var country = _mapper.Map<Country>(countryDTO);
+            await _unitOfWork.Countries.Insert(country);
+            await _unitOfWork.Save();
+
+            return CreatedAtRoute("GetCountry", new { id = country.Id }, country);
+
         }
 
 
