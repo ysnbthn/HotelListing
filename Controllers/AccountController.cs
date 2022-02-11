@@ -35,31 +35,23 @@ namespace HotelListing.Controllers
                 return BadRequest(ModelState);
             }
 
-            try
-            {
-                var user = _mapper.Map<ApiUser>(userDTO);
-                user.UserName = userDTO.Email;
-                // userı alıyor password hashliyor
-                var result = await _userManager.CreateAsync(user, userDTO.Password);
+            var user = _mapper.Map<ApiUser>(userDTO);
+            user.UserName = userDTO.Email;
+            // userı alıyor password hashliyor
+            var result = await _userManager.CreateAsync(user, userDTO.Password);
 
-                if (!result.Succeeded)
-                {
-                    foreach (var error in result.Errors)
-                    {
-                        _logger.LogInformation(error.Code, error.Description);
-                        ModelState.AddModelError(error.Code, error.Description);
-                    }
-                    return BadRequest(ModelState);
-                }
-                await _userManager.AddToRolesAsync(user, userDTO.Roles);
-                return Accepted();
-            }
-            catch (Exception ex)
+            if (!result.Succeeded)
             {
-                _logger.LogInformation($"Something Went Wrong in the {nameof(Register)}" + ex.Message);
-                // hata döndürmenin farklı yolu
-                return Problem("Internal Server Error. Please Try Again Later." + ex.Message, statusCode: 500);
+                foreach (var error in result.Errors)
+                {
+                    _logger.LogInformation(error.Code, error.Description);
+                    ModelState.AddModelError(error.Code, error.Description);
+                }
+                return BadRequest(ModelState);
             }
+            await _userManager.AddToRolesAsync(user, userDTO.Roles);
+            return Accepted();
+
         }
         [HttpPost]
         [Route("login")]
@@ -71,22 +63,14 @@ namespace HotelListing.Controllers
                 return BadRequest(ModelState);
             }
 
-            try
+            // eğer token yoksa izin verme
+            if (!await _authManager.ValidateUser(userDTO))
             {
-                // eğer token yoksa izin verme
-                if (!await _authManager.ValidateUser(userDTO))
-                {
-                    return Unauthorized();
-                }
-                // giriş başarılı olursa token yapıp geri yolla
-                return Accepted(new { Token = await _authManager.CreateToken() });
+                return Unauthorized();
             }
-            catch (Exception ex)
-            {
-                _logger.LogInformation($"Something Went Wrong in the {nameof(Login)}");
-                // hata döndürmenin farklı yolu
-                return Problem($"Something Went Wrong in the {nameof(Login)}", statusCode: 500);
-            }
+            // giriş başarılı olursa token yapıp geri yolla
+            return Accepted(new { Token = await _authManager.CreateToken() });
+
         }
     }
 }

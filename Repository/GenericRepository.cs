@@ -1,7 +1,9 @@
 ﻿using HotelListing.Data;
 using HotelListing.IRepository;
+using HotelListing.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using X.PagedList;
 
 namespace HotelListing.Repository
 {
@@ -64,6 +66,23 @@ namespace HotelListing.Repository
             }
 
             return await query.AsNoTracking().ToListAsync();
+        }
+
+        public async Task<IPagedList<T>> GetPagedList(RequestParams reqestParams, List<string> includes = null)
+        {
+            IQueryable<T> query = _db;
+
+
+            if (includes != null)
+            {
+                foreach (var includeProperty in includes)
+                {
+                    query = query.Include(includeProperty);
+                }
+            }
+            // normalde algoritmayı kendin yazman lazım ama biz kütüphane kullanıyoruz
+            return await query.AsNoTracking().ToPagedListAsync(reqestParams.PageNumber, reqestParams.PageSize);
+
         }
 
         public async Task Insert(T entity)

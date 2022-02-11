@@ -11,8 +11,6 @@ using Serilog;
 var builder = WebApplication.CreateBuilder(args);
 // servisleri ekle
 ServiceExtensions.AddServices(builder);
-ServiceExtensions.ConfigureIdentity(builder.Services);
-ServiceExtensions.ConfigureJwt(builder);
 
 var app = builder.Build();
 
@@ -23,6 +21,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.ConfigureExceptionHandler();
+
 app.UseHttpsRedirection();
 
 app.UseCors("AllowAll");
@@ -31,6 +31,10 @@ app.UseCors("AllowAll");
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+// burayada response cache ekle
+app.UseResponseCaching();
+app.UseHttpCacheHeaders();
 
 app.MapControllers();
 
