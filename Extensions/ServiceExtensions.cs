@@ -1,4 +1,5 @@
-﻿using HotelListing.Configurations;
+﻿using AspNetCoreRateLimit;
+using HotelListing.Configurations;
 using HotelListing.Data;
 using HotelListing.Entities;
 using HotelListing.IRepository;
@@ -32,7 +33,8 @@ namespace HotelListing.Extensions
             );
 
             // kimler api'ya erişebilir
-            builder.Services.AddCors(policy => {
+            builder.Services.AddCors(policy =>
+            {
                 policy.AddPolicy("AllowAll", bldr =>
                     // şimdilik herkes
                     bldr.AllowAnyOrigin()
@@ -45,6 +47,11 @@ namespace HotelListing.Extensions
             builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IAuthManager, AuthManager>();
 
+            //rate limit fonksiyonunu servislere ekle
+            builder.Services.AddMemoryCache();
+            ConfigureRateLimiting(builder);
+            builder.Services.AddHttpContextAccessor();
+
             // response cache ekle
             ConfigureHttpCacheHeaders(builder);
 
@@ -53,15 +60,15 @@ namespace HotelListing.Extensions
             AddSwaggerDoc(builder.Services);
             // reverse navigation loopa girerse onu görmezden gel
             // add controller içine global caching ekle
-            builder.Services.AddControllers( config =>
-            {
-                // isim ver süresini belirt
-                config.CacheProfiles.Add("120SecondsDuration", new CacheProfile
-                {
-                    Duration = 120
-                });
-            }).AddNewtonsoftJson(op =>
-                op.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+            builder.Services.AddControllers(config =>
+           {
+               // isim ver süresini belirt
+               config.CacheProfiles.Add("120SecondsDuration", new CacheProfile
+               {
+                   Duration = 120
+               });
+           }).AddNewtonsoftJson(op =>
+               op.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
             // api versioning fonksiyonunu buraya koy
             ConfigureVersioning(builder);
@@ -154,28 +161,28 @@ namespace HotelListing.Extensions
         public static void ConfigureExceptionHandler(this IApplicationBuilder app)
         {
             // var olan exception handler'ı override et
-            app.UseExceptionHandler( error =>
-            {
-                error.Run(async context =>
-                {
-                    context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                    context.Response.ContentType = "application/json";
-                    var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
-                    if (contextFeature != null)
-                    {
-                        // hata olursa hatayı logla geriye status code ile mesajı döndür.
-                        Log.Error($"Something Went Wrong in the { contextFeature.Error }");
+            app.UseExceptionHandler(error =>
+           {
+               error.Run(async context =>
+               {
+                   context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                   context.Response.ContentType = "application/json";
+                   var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
+                   if (contextFeature != null)
+                   {
+                       // hata olursa hatayı logla geriye status code ile mesajı döndür.
+                       Log.Error($"Something Went Wrong in the { contextFeature.Error }");
 
-                        await context.Response.WriteAsync(new Error
-                        {
-                            StatusCode = context.Response.StatusCode,
-                            Message = "Internal Server Error. Please Try Again Later."
-                        }.ToString());
-                    }
-                });
-            });
+                       await context.Response.WriteAsync(new Error
+                       {
+                           StatusCode = context.Response.StatusCode,
+                           Message = "Internal Server Error. Please Try Again Later."
+                       }.ToString());
+                   }
+               });
+           });
         }
-        
+
         private static void ConfigureVersioning(WebApplicationBuilder builder)
         {
             builder.Services.AddApiVersioning(opt =>
@@ -202,6 +209,28 @@ namespace HotelListing.Extensions
             );
 
         }
+        // rate lmit ayarları
+        public static void ConfigureRateLimiting(WebApplicationBuilder builder)
+        {
+            // birden fazla rule olabilir
+            var rateLimitRules = new List<RateLimitRule>
+            {
+                new RateLimitRule
+                {
+                    Endpoint = "*",
+                    Limit = 1,
+                    Period = "3s" // 3 saniyde 1 requeste izin var
+                }
 
+            };
+            builder.Services.Configure<IpRateLimitOptions>(opt =>
+            {
+                opt.GeneralRules = rateLimitRules;
+            });
+            builder.Services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+            builder.Services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+            builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+            builder.Services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
+        }
     }
 }

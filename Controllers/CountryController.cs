@@ -6,6 +6,7 @@ using Marvin.Cache.Headers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace HotelListing.Controllers
 {
@@ -26,8 +27,8 @@ namespace HotelListing.Controllers
 
         [HttpGet]
         // custom local cache settings
-        [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 60)]
-        [HttpCacheValidation(MustRevalidate = false)]
+        //[HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 60)]
+        //[HttpCacheValidation(MustRevalidate = false)]
         public async Task<IActionResult> GetCountries([FromQuery] RequestParams requestParams)
         {
 
@@ -43,7 +44,7 @@ namespace HotelListing.Controllers
 
             // generic repositorye gidicek orda includes parametresinden bunu include edicek
             // reverse navigation sayesinde isimleri de çekecek
-            var country = await _unitOfWork.Countries.Get(q => q.Id == id, new List<string> { "Hotels" });
+            var country = await _unitOfWork.Countries.Get(q => q.Id == id, include: q => q.Include(x => x.Hotels));
             if (country == null) { throw new Exception(); }
             var result = _mapper.Map<CountryDTO>(country);
             return Ok(result);
@@ -78,7 +79,7 @@ namespace HotelListing.Controllers
                 return BadRequest(ModelState);
             }
 
-            var country = await _unitOfWork.Countries.Get(q => q.Id == id, new List<string> { "Hotels" });
+            var country = await _unitOfWork.Countries.Get(q => q.Id == id, include: q => q.Include(x => x.Hotels));
             _mapper.Map(countryDTO.Hotels, country.Hotels);
             _mapper.Map(countryDTO, country);
             if (country == null)

@@ -5,6 +5,7 @@ using HotelListing.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace HotelListing.Controllers
 {
@@ -42,8 +43,8 @@ namespace HotelListing.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetHotel(int id)
         {
-
-            var hotel = await _unitOfWork.Hotels.Get(q => q.Id == id, new List<string> { "Country" });
+            // artık include string listesi yerine linQ var
+            var hotel = await _unitOfWork.Hotels.Get(q => q.Id == id, include: q=> q.Include(x=> x.Country));
             if (hotel == null) { throw new Exception(); }
             var result = _mapper.Map<HotelDTO>(hotel);
             return Ok(result);

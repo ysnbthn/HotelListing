@@ -1,3 +1,4 @@
+using AspNetCoreRateLimit;
 using HotelListing.Configurations;
 using HotelListing.Data;
 using HotelListing.Entities;
@@ -34,6 +35,8 @@ app.UseAuthorization();
 
 // burayada response cache ekle
 app.UseResponseCaching();
+// ip rate limit ekle
+app.UseIpRateLimiting();
 app.UseHttpCacheHeaders();
 
 app.MapControllers();
