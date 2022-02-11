@@ -11,6 +11,7 @@ using Serilog;
 var builder = WebApplication.CreateBuilder(args);
 // servisleri ekle
 ServiceExtensions.AddServices(builder);
+ServiceExtensions.ConfigureIdentity(builder.Services);
 ServiceExtensions.ConfigureJwt(builder);
 
 var app = builder.Build();

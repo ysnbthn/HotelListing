@@ -26,12 +26,7 @@ namespace HotelListing.Extensions
             options.UseSqlServer(builder.Configuration.GetConnectionString("sqlConnection"))
             );
 
-            // kullanıcılara kimlik servisi ekle
-            builder.Services.AddIdentityCore<ApiUser>(q => q.User.RequireUniqueEmail = true)
-                .AddRoles<IdentityRole>()
-                .AddEntityFrameworkStores<DatabaseContext>();
-           
-
+            
             // kimler api'ya erişebilir
             builder.Services.AddCors(policy => {
                 policy.AddPolicy("AllowAll", bldr =>
@@ -65,6 +60,16 @@ namespace HotelListing.Extensions
             builder.Services.AddControllers();
 
         }
+
+        public static void ConfigureIdentity(this IServiceCollection services)
+        {
+            var builder = services.AddIdentityCore<ApiUser>(q => { q.User.RequireUniqueEmail = true; });
+
+            builder = new IdentityBuilder(builder.UserType, typeof(IdentityRole), services);
+            builder.AddTokenProvider("HotelListingApi", typeof(DataProtectorTokenProvider<ApiUser>));
+            builder.AddEntityFrameworkStores<DatabaseContext>().AddDefaultTokenProviders();
+        }
+
         // JWT'yi swagger documentation'a ekle
         private static void AddSwaggerDoc(IServiceCollection services)
         {
