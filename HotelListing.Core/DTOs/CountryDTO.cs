@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace HotelListing.Models
+namespace HotelListing.Core.DTOs
 {
     // aynı yere koyduk çünkü Single Responsibility Pattern
     public class CreateCountryDTO

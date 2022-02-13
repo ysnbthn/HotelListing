@@ -1,7 +1,7 @@
-﻿using HotelListing.Data;
-using HotelListing.IRepository;
+﻿using HotelListing.Core.IRepository;
+using HotelListing.Data;
 
-namespace HotelListing.Repository
+namespace HotelListing.Core.Repository
 {
     public class UnitOfWork : IUnitOfWork
     {

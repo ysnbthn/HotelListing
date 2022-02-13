@@ -1,6 +1,6 @@
 ﻿using HotelListing.Data;
 
-namespace HotelListing.IRepository
+namespace HotelListing.Core.IRepository
 {
     public interface IUnitOfWork : IDisposable
     {

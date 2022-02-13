@@ -1,6 +1,5 @@
 using AspNetCoreRateLimit;
-using HotelListing.Extensions;
-
+using HotelListing.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 // servisleri ekle

@@ -1,23 +1,27 @@
 ﻿using AspNetCoreRateLimit;
-using HotelListing.Configurations;
+using HotelListing.Core.Configurations;
+using HotelListing.Core.IRepository;
+using HotelListing.Core.Models;
+using HotelListing.Core.Repository;
+using HotelListing.Core.Services;
 using HotelListing.Data;
-using HotelListing.IRepository;
-using HotelListing.Models;
-using HotelListing.Repository;
-using HotelListing.Services;
 using Marvin.Cache.Headers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using System.Text;
 
-namespace HotelListing.Extensions
+namespace HotelListing.Core
 {
     public static class ServiceExtensions
     {

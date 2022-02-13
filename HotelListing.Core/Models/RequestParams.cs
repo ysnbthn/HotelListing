@@ -1,4 +1,4 @@
-﻿namespace HotelListing.Models
+﻿namespace HotelListing.Core.Models
 {
     public class RequestParams
     {
