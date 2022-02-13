@@ -29,10 +29,9 @@ namespace HotelListing.Core
         public static void AddServices(WebApplicationBuilder builder)
         {
             ConfigureIdentity(builder.Services);
-            // db context ekle
+            // db context ekle | eğer proje sonradan taşınırsa db context hangi projede belirt
             builder.Services.AddDbContext<DatabaseContext>(options =>
-            options.UseSqlServer(builder.Configuration.GetConnectionString("sqlConnection"))
-            );
+            options.UseSqlServer(builder.Configuration.GetConnectionString("sqlConnection"), a=>a.MigrationsAssembly("HotelListings.Data") ));
 
             // kimler api'ya erişebilir
             builder.Services.AddCors(policy =>
