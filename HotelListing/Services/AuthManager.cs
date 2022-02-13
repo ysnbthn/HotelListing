@@ -1,4 +1,4 @@
-﻿using HotelListing.Entities;
+﻿using HotelListing.Data;
 using HotelListing.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;

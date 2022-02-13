@@ -1,4 +1,4 @@
-﻿using HotelListing.Entities;
+﻿using HotelListing.Data;
 
 namespace HotelListing.IRepository
 {

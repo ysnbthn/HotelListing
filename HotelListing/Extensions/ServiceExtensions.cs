@@ -1,7 +1,6 @@
 ﻿using AspNetCoreRateLimit;
 using HotelListing.Configurations;
 using HotelListing.Data;
-using HotelListing.Entities;
 using HotelListing.IRepository;
 using HotelListing.Models;
 using HotelListing.Repository;
@@ -16,7 +15,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
-using System.Net.Http;
 using System.Text;
 
 namespace HotelListing.Extensions

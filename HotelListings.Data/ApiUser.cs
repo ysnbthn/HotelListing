@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace HotelListing.Entities
+namespace HotelListing.Data
 {
     public class ApiUser : IdentityUser
     {

@@ -1,13 +1,6 @@
 using AspNetCoreRateLimit;
-using HotelListing.Configurations;
-using HotelListing.Data;
-using HotelListing.Entities;
 using HotelListing.Extensions;
-using HotelListing.IRepository;
-using HotelListing.Repository;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Serilog;
+
 
 var builder = WebApplication.CreateBuilder(args);
 // servisleri ekle

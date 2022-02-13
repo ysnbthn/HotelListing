@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using HotelListing.Entities;
+using HotelListing.Data;
 using HotelListing.Models;
 
 namespace HotelListing.Configurations

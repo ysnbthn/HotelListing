@@ -1,8 +1,7 @@
-﻿using HotelListing.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace HotelListing.Configurations
+namespace HotelListing.Data.Configurations.Entities
 {
     public class HotelConfiguration : IEntityTypeConfiguration<Hotel>
     {

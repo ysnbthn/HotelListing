@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using HotelListing.Entities;
+using HotelListing.Data;
 using HotelListing.Models;
 using HotelListing.Services;
 using Microsoft.AspNetCore.Http;

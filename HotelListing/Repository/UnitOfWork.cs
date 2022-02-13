@@ -1,5 +1,4 @@
 ﻿using HotelListing.Data;
-using HotelListing.Entities;
 using HotelListing.IRepository;
 
 namespace HotelListing.Repository
