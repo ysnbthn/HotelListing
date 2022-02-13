@@ -1,4 +1,5 @@
 ﻿using HotelListing.Core.DTOs;
+using HotelListing.Core.Models;
 using HotelListing.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -83,6 +84,42 @@ namespace HotelListing.Core.Services
             // başka fonksiyonda kullanmak için yukarıdan çektik
             _user = await _userManager.FindByNameAsync(userDTO.Email);
             return (_user != null && await _userManager.CheckPasswordAsync(_user, userDTO.Password));
+        }
+
+        public async Task<string> CreateRefreshToken()
+        {
+            // userın tokenı iptal et
+            await _userManager.RemoveAuthenticationTokenAsync(_user, "HotelListingApi", "RefreshToken");
+            // yeni token yap
+            var newRefreshToken = await _userManager.GenerateUserTokenAsync(_user, "HotelListingApi", "RefreshToken");
+            var result = await _userManager.SetAuthenticationTokenAsync(_user, "HotelListingApi", "RefreshToken", newRefreshToken);
+            return newRefreshToken;
+        }
+
+        public async Task<TokenRequest> VerifyRefreshToken(TokenRequest request)
+        {
+            JwtSecurityTokenHandler jwtSecurityTokenHandler = new (); // eğer class adı belliyse böyle newleyebilirsin
+            // tokenı c# objesi yap
+            var tokenContent = jwtSecurityTokenHandler.ReadJwtToken(request.Token);
+            var username = tokenContent.Claims.ToList().FirstOrDefault(q => q.Type == ClaimTypes.Name)?.Value;
+            // claimden userı bul
+            _user = await _userManager.FindByNameAsync(username);
+            try
+            {
+                // token geçerliyse yenile yoksa userı at tekrar login olmak zorunda kalsın
+                var isValid = await _userManager.VerifyUserTokenAsync(_user, "HotelListingApi", "RefreshToken", request.RefreshToken);
+                if (isValid)
+                {
+                    return new TokenRequest { Token = await CreateToken(), RefreshToken = await CreateRefreshToken() };
+                }
+                await _userManager.UpdateSecurityStampAsync(_user);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return null;
         }
     }
 }
