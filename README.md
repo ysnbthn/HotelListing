@@ -1,6 +1,6 @@
 # Hotel Listing API
 
-### REST Web API built using ASP.Net Core 6.0 . It returns list of hotels and countries have that hotels. It also has JWT Tokens, ASP.NET Core Identity for user authentication and ip rate limiting for security. 
+### REST Web API built using ASP.Net Core 6.0. It returns list of hotels, its rating and its country. It has JWT Tokens, ASP.NET Core Identity for user authentication and IP rate limiting for security. 
 
 <br>
 
